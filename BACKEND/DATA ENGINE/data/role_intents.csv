@@ -1,0 +1,13 @@
+role,intent
+Student,skill_gap
+Student,career
+Student,internship
+HR,screening
+HR,role_match
+HR,skill_requirement
+College,performance
+College,placement
+College,training
+Referrer,candidate
+Referrer,match
+Referrer,resume
