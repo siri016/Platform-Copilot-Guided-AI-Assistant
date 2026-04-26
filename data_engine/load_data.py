@@ -16,7 +16,7 @@ conn = get_db()
 cur = conn.cursor()
 
 for table, file in FILES.items():
-    with open(f"data_engine/data/{file}") as f:
+    with open(f"data/{file}") as f:
         reader = csv.DictReader(f)
         cols = reader.fieldnames
         for row in reader:

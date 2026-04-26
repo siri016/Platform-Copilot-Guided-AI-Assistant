@@ -1,6 +1,8 @@
 import sqlite3
+import os
 
 def get_db():
-    conn = sqlite3.connect("copilot.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "copilot.db")
+    print("USING DB:", db_path)   # debug
+    return sqlite3.connect(db_path)

@@ -1,5 +1,17 @@
+import sys
+import os
+
+# Allow importing from parent folders
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+
+from logic.student import handle_student
+from logic.hr import handle_hr
+from logic.referrer import handle_referrer
+from logic.college import handle_college
+from data_engine.logger import log
 
 app = Flask(__name__)
 CORS(app)
@@ -8,18 +20,6 @@ CORS(app)
 @app.route('/')
 def home():
     return "Backend Running ✅"
-
-# ---------------- ROLES ----------------
-@app.route('/api/roles', methods=['GET'])
-def get_roles():
-    return jsonify({
-        "roles": [
-            {"id": "student", "label": "Student"},
-            {"id": "hr", "label": "HR"},
-            {"id": "referrer", "label": "Referrer"},
-            {"id": "college", "label": "College"}
-        ]
-    })
 
 # ---------------- INTENTS ----------------
 @app.route('/api/intents', methods=['GET'])
@@ -35,7 +35,7 @@ def get_intents():
                     {"id": "student_id", "label": "Student ID", "type": "text"},
                     {
                         "id": "company",
-                        "label": "Company Name",
+                        "label": "Company",
                         "type": "select",
                         "options": ["Google", "Amazon", "Infosys", "TCS", "Wipro"]
                     }
@@ -43,132 +43,126 @@ def get_intents():
             },
             {
                 "id": "find_opportunities",
-                "label": "Find Internship Opportunities",
+                "label": "Find Opportunities",
                 "fields": [
                     {
                         "id": "skill",
-                        "label": "Your Skill",
+                        "label": "Skill",
                         "type": "select",
-                        "options": ["Python", "Java", "React", "Machine Learning", "Data Science"]
+                        "options": ["Python", "Java", "React"]
                     },
                     {
                         "id": "domain",
-                        "label": "Preferred Domain",
+                        "label": "Domain",
                         "type": "select",
-                        "options": ["Technology", "Finance", "Marketing", "Design"]
+                        "options": ["Technology", "Finance"]
                     },
                     {
                         "id": "location",
                         "label": "Location",
                         "type": "select",
-                        "options": ["Remote", "Bangalore", "Mumbai", "Delhi", "Hyderabad"]
-                    }
-                ]
-            },
-            {
-                "id": "profile_tips",
-                "label": "Get Profile Improvement Tips",
-                "fields": [
-                    {
-                        "id": "cgpa",
-                        "label": "Your CGPA",
-                        "type": "select",
-                        "options": ["Below 6", "6 to 7", "7 to 8", "Above 8"]
-                    },
-                    {
-                        "id": "skills_count",
-                        "label": "Number of Skills",
-                        "type": "select",
-                        "options": ["1-2 skills", "3-4 skills", "5+ skills"]
-                    },
-                    {
-                        "id": "target_role",
-                        "label": "Target Role",
-                        "type": "select",
-                        "options": ["Software Engineer", "Data Analyst", "Product Manager", "Designer"]
+                        "options": ["Bangalore", "Remote"]
                     }
                 ]
             }
         ],
+
         "hr": [
             {
-                "id": "post_job",
-                "label": "Post Job",
+                "id": "view_candidates",
+                "label": "View Candidates",
                 "fields": [
-                    {"id": "role", "label": "Job Role", "type": "text"}
+                    {"id": "job_role", "label": "Job Role", "type": "text"},
+                    {
+                        "id": "status_filter",
+                        "label": "Status",
+                        "type": "select",
+                        "options": ["All", "Shortlisted", "Pending"]
+                    }
                 ]
             }
         ],
+
         "referrer": [
             {
-                "id": "track",
+                "id": "track_referral",
                 "label": "Track Referral",
                 "fields": [
-                    {"id": "ref_id", "label": "Referral ID", "type": "text"}
+                    {"id": "referral_id", "label": "Referral ID", "type": "text"},
+                    {"id": "candidate_name", "label": "Candidate Name", "type": "text"}
                 ]
             }
         ],
+
         "college": [
             {
-                "id": "stats",
+                "id": "placement_stats",
                 "label": "Placement Stats",
                 "fields": [
-                    {"id": "dept", "label": "Department", "type": "text"}
+                    {"id": "department", "label": "Department", "type": "text"},
+                    {"id": "batch_year", "label": "Batch Year", "type": "text"}
                 ]
             }
         ]
     }
 
-    if role not in intents:
-        return jsonify({"error": "Invalid role"}), 400
-
-    return jsonify({"intents": intents[role]})
+    return jsonify({"intents": intents.get(role, [])})
 
 # ---------------- PROCESS ----------------
 @app.route('/api/process', methods=['POST'])
 def process():
     data = request.get_json()
 
+    # 🔍 DEBUG PRINTS (VERY IMPORTANT)
+    print("\n=== NEW REQUEST ===")
+    print("RAW DATA:", data)
+
     role = data.get("role")
     intent = data.get("intent")
     inputs = data.get("inputs", {})
 
-    if role == "student":
+    print("ROLE:", role)
+    print("INTENT:", intent)
+    print("INPUTS:", inputs)
 
-        if intent == "check_status":
-            if not inputs.get("student_id") or not inputs.get("company"):
-                return jsonify({"error": "Missing required fields"}), 400
+    try:
+        # Logging
+        log(role, intent)
 
-            return jsonify({
-                "message": f"Status for {inputs.get('student_id')} at {inputs.get('company')} is PROCESSING"
-            })
+        if role == "student":
+            result = handle_student(intent, inputs)
 
-        elif intent == "find_opportunities":
-            return jsonify({
-                "message": f"Opportunities for {inputs.get('skill')} in {inputs.get('location')}"
-            })
+        elif role == "hr":
+            result = handle_hr(intent, inputs)
 
-        elif intent == "profile_tips":
-            return jsonify({
-                "message": f"Improve profile for {inputs.get('target_role')} with {inputs.get('skills_count')}"
-            })
+        elif role == "referrer":
+            result = handle_referrer(intent, inputs)
+
+        elif role == "college":
+            result = handle_college(intent, inputs)
 
         else:
-            return jsonify({"error": "Invalid intent"}), 400
+            return jsonify({
+                "insight": "Invalid role",
+                "status": "error",
+                "suggestions": ["Choose a valid role"],
+                "actions": ["Retry"]
+            }), 400
 
-    elif role == "hr":
-        return jsonify({"message": "Job posted"})
+        print("RESULT:", result)  # 🔍 DEBUG
 
-    elif role == "referrer":
-        return jsonify({"message": "Referral tracked"})
+        return jsonify(result)
 
-    elif role == "college":
-        return jsonify({"message": "Stats shown"})
+    except Exception as e:
+        print("🔥 ERROR OCCURRED:", str(e))  # 🔥 CRITICAL DEBUG
 
-    else:
-        return jsonify({"error": "Invalid role"}), 400
+        return jsonify({
+            "insight": "Server Error",
+            "status": "error",
+            "suggestions": [str(e)],
+            "actions": ["Retry"]
+        }), 500
 
 
-# ---------------- RUN ----------------
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

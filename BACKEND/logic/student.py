@@ -1,4 +1,4 @@
- def handle_student(intent, inputs):
+def handle_student(intent, inputs):
 
     # ── INTENT 1: Check Application Status ──
     if intent == 'check_status':

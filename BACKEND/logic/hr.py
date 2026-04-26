@@ -1,4 +1,4 @@
- def handle_hr(intent, inputs):
+def handle_hr(intent, inputs):
 
     # ── INTENT 1: View Candidate List ──
     if intent == 'view_candidates':

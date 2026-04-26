@@ -1,4 +1,4 @@
-from db import get_db
+from .db import get_db
 from datetime import datetime
 
 def log(role, intent):

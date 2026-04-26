@@ -1,4 +1,5 @@
- import random
+ 
+import random
 import string
 
 def handle_referrer(intent, inputs):

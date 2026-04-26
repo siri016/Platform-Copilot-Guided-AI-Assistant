@@ -34,5 +34,43 @@ const roles = [
 function RoleSelection({ onRoleSelect }) {
   return (
     <div>
+      {/* Title */}
       <div className="page-title">Welcome to Platform Copilot 👋</div>
-      <div className="page-su
+
+      {/* Subtitle */}
+      <div className="page-sub">
+        Select your role to continue
+      </div>
+
+      {/* Role Cards */}
+      <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {roles.map((role) => (
+          <div
+            key={role.id}
+            onClick={() => onRoleSelect(role)}
+            style={{
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              padding: '16px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}
+          >
+            <div style={{ fontSize: '24px' }}>{role.icon}</div>
+
+            <div>
+              <div style={{ fontWeight: 'bold' }}>{role.label}</div>
+              <div style={{ fontSize: '12px', color: '#555' }}>
+                {role.desc}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default RoleSelection;
