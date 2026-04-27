@@ -1,39 +1,67 @@
-import React from 'react';
+import React from "react";
 
 function OutputCard({ output, onBack, onRestart }) {
 
+  const cardStyle = {
+    background: "#FFFFFF",
+    borderRadius: "10px",
+    padding: "20px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+    marginBottom: "20px"
+  };
+
+  const sectionTitle = {
+    fontSize: "13px",
+    fontWeight: "600",
+    color: "#0D9488",
+    marginBottom: "14px",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px"
+  };
+
   const getBadge = (status) => {
-    if (status === 'success') return <span className="badge-success">✓ Success</span>;
-    if (status === 'pending') return <span className="badge-pending">⏳ Pending</span>;
-    if (status === 'error')   return <span className="badge-error">✗ Error</span>;
+    const base = {
+      padding: "6px 10px",
+      borderRadius: "6px",
+      fontSize: "12px",
+      fontWeight: "500"
+    };
+
+    if (status === "success") {
+      return <span style={{ ...base, background: "#DCFCE7", color: "#166534" }}>✓ Success</span>;
+    }
+    if (status === "pending") {
+      return <span style={{ ...base, background: "#FEF9C3", color: "#854D0E" }}>⏳ Pending</span>;
+    }
+    if (status === "error") {
+      return <span style={{ ...base, background: "#FEE2E2", color: "#991B1B" }}>✗ Error</span>;
+    }
     return null;
   };
 
   return (
-    <div style={{ maxWidth: '700px' }}>
+    <div style={{ maxWidth: "800px" }}>
 
-      <div className="page-title">Your Results 📋</div>
-      <div className="page-sub">
+      {/* HEADER */}
+      <h1 style={{ color: "#0F172A", marginBottom: "6px" }}>
+        Your Results 📋
+      </h1>
+      <p style={{ color: "#64748B", marginBottom: "20px" }}>
         Here is what our system found for you
-      </div>
+      </p>
 
-      {/* Main Insight Card */}
-      <div className="card" style={{
-        borderLeft: '4px solid #0D9488',
-        marginBottom: '20px'
-      }}>
+      {/* INSIGHT */}
+      <div style={{ ...cardStyle, borderLeft: "4px solid #0D9488" }}>
         <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: '12px'
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "12px"
         }}>
           <div style={{
-            fontSize: '18px',
-            fontWeight: 'bold',
-            color: '#0F172A',
-            flex: 1,
-            lineHeight: '1.5'
+            fontSize: "18px",
+            fontWeight: "600",
+            color: "#0F172A",
+            lineHeight: "1.5"
           }}>
             {output.insight}
           </div>
@@ -41,47 +69,36 @@ function OutputCard({ output, onBack, onRestart }) {
         </div>
       </div>
 
-      {/* Suggestions Card */}
-      {output.suggestions && output.suggestions.length > 0 && (
-        <div className="card" style={{ marginBottom: '20px' }}>
-          <div style={{
-            fontSize: '13px',
-            fontWeight: 'bold',
-            color: '#0D9488',
-            marginBottom: '16px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
-            💡 Suggestions
-          </div>
+      {/* SUGGESTIONS */}
+      {output.suggestions?.length > 0 && (
+        <div style={cardStyle}>
+          <div style={sectionTitle}>💡 Suggestions</div>
 
           {output.suggestions.map((s, i) => (
             <div key={i} style={{
-              display: 'flex',
-              gap: '12px',
-              marginBottom: '12px',
-              alignItems: 'flex-start'
+              display: "flex",
+              gap: "12px",
+              marginBottom: "12px"
             }}>
               <div style={{
-                minWidth: '26px',
-                height: '26px',
-                borderRadius: '50%',
-                background: '#0D9488',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                flexShrink: 0
+                minWidth: "26px",
+                height: "26px",
+                borderRadius: "50%",
+                background: "#0D9488",
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "12px",
+                fontWeight: "600"
               }}>
                 {i + 1}
               </div>
+
               <div style={{
-                fontSize: '14px',
-                color: '#475569',
-                paddingTop: '4px',
-                lineHeight: '1.5'
+                fontSize: "14px",
+                color: "#475569",
+                lineHeight: "1.5"
               }}>
                 {s}
               </div>
@@ -90,148 +107,66 @@ function OutputCard({ output, onBack, onRestart }) {
         </div>
       )}
 
-      {/* Candidates List — HR only */}
-      {output.candidates && output.candidates.length > 0 && (
-        <div className="card" style={{ marginBottom: '20px' }}>
-          <div style={{
-            fontSize: '13px',
-            fontWeight: 'bold',
-            color: '#0D9488',
-            marginBottom: '16px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
-            👥 Candidates
-          </div>
-
-          {output.candidates.map((c, i) => (
-            <div key={i} style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '10px 14px',
-              background: '#F1F5F9',
-              borderRadius: '6px',
-              marginBottom: '8px'
-            }}>
-              <span style={{
-                fontWeight: '500',
-                color: '#0F172A'
-              }}>
-                {c.name}
-              </span>
-              <span style={{
-                color: '#0D9488',
-                fontWeight: '500'
-              }}>
-                {c.score}
-              </span>
-              <span className="badge-pending">{c.status}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Jobs List — Student only */}
-      {output.jobs && output.jobs.length > 0 && (
-        <div className="card" style={{ marginBottom: '20px' }}>
-          <div style={{
-            fontSize: '13px',
-            fontWeight: 'bold',
-            color: '#0D9488',
-            marginBottom: '16px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
-            🎯 Matching Opportunities
-          </div>
+      {/* JOBS */}
+      {output.jobs?.length > 0 && (
+        <div style={cardStyle}>
+          <div style={sectionTitle}>🎯 Matching Opportunities</div>
 
           {output.jobs.map((job, i) => (
             <div key={i} style={{
-              padding: '10px 14px',
-              background: '#F1F5F9',
-              borderRadius: '6px',
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: '#0F172A',
-              display: 'flex',
-              gap: '10px',
-              alignItems: 'center'
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "10px",
+              background: "#F1F5F9",
+              borderRadius: "6px",
+              marginBottom: "8px"
             }}>
-              <span style={{
-                background: '#0D9488',
-                color: '#fff',
-                borderRadius: '50%',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                flexShrink: 0
+              <div style={{
+                background: "#0D9488",
+                color: "#fff",
+                borderRadius: "50%",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "12px",
+                fontWeight: "600"
               }}>
                 {i + 1}
-              </span>
-              {job}
+              </div>
+
+              <span style={{ color: "#0F172A" }}>{job}</span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Referral History — Referrer only */}
-      {output.history && output.history.length > 0 && (
-        <div className="card" style={{ marginBottom: '20px' }}>
-          <div style={{
-            fontSize: '13px',
-            fontWeight: 'bold',
-            color: '#0D9488',
-            marginBottom: '16px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
-            📋 Referral History
-          </div>
+      {/* ACTIONS */}
+      {output.actions?.length > 0 && (
+        <div style={cardStyle}>
+          <div style={sectionTitle}>⚡ Actions</div>
 
-          {output.history.map((item, i) => (
-            <div key={i} style={{
-              padding: '10px 14px',
-              background: '#F1F5F9',
-              borderRadius: '6px',
-              marginBottom: '8px',
-              fontSize: '14px',
-              color: '#0F172A'
-            }}>
-              {i + 1}. {item}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      {output.actions && output.actions.length > 0 && (
-        <div className="card" style={{ marginBottom: '20px' }}>
-          <div style={{
-            fontSize: '13px',
-            fontWeight: 'bold',
-            color: '#0D9488',
-            marginBottom: '16px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
-            ⚡ Actions
-          </div>
-
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            flexWrap: 'wrap'
-          }}>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             {output.actions.map((action, i) => (
               <button
                 key={i}
-                className={i === 0 ? 'btn-primary' : 'btn-secondary'}
-                onClick={() => alert(`Action: ${action}`)}
+                onClick={() => {
+                  if (action === "Apply Now") {
+                    alert("Application process started successfully!");
+                  } else {
+                    alert(`Action: ${action}`);
+                  }
+                }}
+                style={{
+                  background: i === 0 ? "#0D9488" : "transparent",
+                  color: i === 0 ? "#fff" : "#0D9488",
+                  border: "1px solid #0D9488",
+                  padding: "10px 16px",
+                  borderRadius: "6px",
+                  cursor: "pointer"
+                }}
               >
                 {action}
               </button>
@@ -240,16 +175,31 @@ function OutputCard({ output, onBack, onRestart }) {
         </div>
       )}
 
-      {/* Navigation Buttons */}
-      <div style={{
-        display: 'flex',
-        gap: '12px',
-        marginTop: '8px'
-      }}>
-        <button className="btn-secondary" onClick={onBack}>
+      {/* NAVIGATION */}
+      <div style={{ display: "flex", gap: "12px" }}>
+        <button
+          onClick={onBack}
+          style={{
+            border: "1px solid #0D9488",
+            background: "transparent",
+            color: "#0D9488",
+            padding: "10px 16px",
+            borderRadius: "6px"
+          }}
+        >
           ← Try Again
         </button>
-        <button className="btn-primary" onClick={onRestart}>
+
+        <button
+          onClick={onRestart}
+          style={{
+            background: "#0D9488",
+            color: "#fff",
+            border: "none",
+            padding: "10px 16px",
+            borderRadius: "6px"
+          }}
+        >
           🔄 Start Over
         </button>
       </div>
