@@ -1,6 +1,4 @@
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:3000/api' 
-    : '/api';
+const API_URL = 'https://platform-copilot.vercel.app/api';
 let currentIntent = null;
 let conversationHistory = [];
 let currentCategory = null;
