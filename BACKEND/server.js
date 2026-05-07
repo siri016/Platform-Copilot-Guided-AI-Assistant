@@ -10,7 +10,16 @@ app.use(cors());
 app.use(express.json());
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
+  apiKey: process.env.GROQ_API_KEY || 'MISSING_API_KEY'
+});
+
+// Root route for health check
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'Backend is running correctly',
+    api_key_configured: !!process.env.GROQ_API_KEY,
+    timestamp: new Date().toISOString()
+  });
 });
 
 const intents = {
@@ -207,8 +216,10 @@ Topic: ${category}`;
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+  });
+}
 
 export default app;

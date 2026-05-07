@@ -1,4 +1,4 @@
-const API_URL = 'https://platform-copilot-backend.vercel.app/api';
+const API_URL = '/api';
 let currentIntent = null;
 let conversationHistory = [];
 let currentCategory = null;
